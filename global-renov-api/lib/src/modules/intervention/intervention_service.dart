@@ -49,4 +49,20 @@ class InterventionService {
 
     return interventionWithNewStatus;
   }
+
+  /// Get an intervention from firebase database
+  Future<Intervention> getInterventionById(String id) async {
+    var snapshot = await _firebaseService.database
+        .reference()
+        .child('interventions')
+        .child(id)
+        .get();
+
+    if (snapshot.isNotEmpty) {
+      snapshot.addEntries(<String, dynamic>{'id': id}.entries);
+      return Intervention.fromJson(snapshot as Map<String, dynamic>);
+    } else {
+      throw Exception('InterventionService: Intervention not found');
+    }
+  }
 }

@@ -83,5 +83,20 @@ Router interventionController() {
           body: 'interventionController: Error deleting intervention: $e');
     }
   });
+
+  // get an intervention by ID
+  router.get('/<id>', (Request request, String id) async {
+    try {
+      var intervention = await interventionService.getInterventionById(id);
+      print('intervention: $intervention');
+      return Response.ok({
+        'interventions': [jsonEncode(intervention.toJson())],
+        'metadata': {}
+      });
+    } catch (e) {
+      return Response.internalServerError(
+          body: 'interventionController: Error fetching intervention: $e');
+    }
+  });
   return router;
 }
