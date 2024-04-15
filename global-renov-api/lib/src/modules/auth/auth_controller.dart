@@ -44,5 +44,44 @@ Router authController() {
       return Response.internalServerError(body: 'Error creating user');
     }
   });
+
+  router.post('/sign-in', (request) async {
+    try {
+      // Read and decode the request body to get a map
+      String content = await request.readAsString();
+      Map<String, dynamic> data = jsonDecode(content);
+
+      // Get email and password from the map
+      String email = data['email'];
+      String password = data['password'];
+
+      // Call the service layer to sign in a user
+      var result =
+          await authService.signInWithEmailAndPassword(email, password);
+
+      // Recover the Firebase ID token
+      final token = await result.user!.getIdToken();
+
+      final userResponse = {
+        "id": result.user!.uid,
+        "email": result.user!.email,
+        "emailVerified": result.user!.emailVerified,
+        "displayName": result.user!.displayName,
+      };
+
+      // Return the result
+      return Response.ok(jsonEncode({
+        "users": [userResponse],
+        "metadata": {
+          "creationTime": result.user!.metadata.creationTime.toString(),
+          "lastSignInTime": result.user!.metadata.lastSignInTime.toString()
+        },
+        "token": token
+      }));
+    } catch (e) {
+      print('Error signing in user: $e');
+      return Response.internalServerError(body: 'Error signing in user');
+    }
+  });
   return router;
 }

@@ -29,4 +29,22 @@ class AuthService {
       throw Exception('AuthService: Error creating user. ${e.toString()}');
     }
   }
+
+  // A function that signs in a user with the provided email and password.
+  // Takes in two parameters: email (String) and password (String).
+  // Returns a Future<void>.
+  Future<UserCredential> signInWithEmailAndPassword(
+      String email, String password) async {
+    try {
+      final userCredential =
+          await _firebaseService.auth.signInWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+
+      return userCredential;
+    } catch (e) {
+      throw Exception('AuthService: Error signing in. ${e.toString()}');
+    }
+  }
 }
