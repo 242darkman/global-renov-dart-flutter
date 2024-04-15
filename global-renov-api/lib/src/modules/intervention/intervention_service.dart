@@ -12,4 +12,27 @@ class InterventionService {
     await ref.set(intervention.toJson());
     return intervention.copyWith(id: ref.key);
   }
+
+  /// Update an existing intervention
+  Future<Intervention> updateIntervention(
+      String id, Map<String, dynamic> updates) async {
+    var ref =
+        _firebaseService.database.reference().child('interventions').child(id);
+    await ref.update(updates);
+    var updatedSnapshot = await ref.get();
+    updatedSnapshot.addEntries(<String, dynamic>{'id': id}.entries);
+
+    Intervention updatedIntervention =
+        Intervention.fromJson(updatedSnapshot as Map<String, dynamic>);
+
+    return updatedIntervention;
+  }
+
+  Future<void> deleteIntervention(String key) async {
+    return await _firebaseService.database
+        .reference()
+        .child('interventions')
+        .child(key)
+        .remove();
+  }
 }

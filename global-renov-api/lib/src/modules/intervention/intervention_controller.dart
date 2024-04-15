@@ -28,5 +28,22 @@ Router interventionController() {
     }
   });
 
+  // update an existing intervention
+  router.put('/update/<id>', (Request request, String id) async {
+    try {
+      String content = await request.readAsString();
+      Map<String, dynamic> updates = jsonDecode(content);
+      var updatedIntervention =
+          await interventionService.updateIntervention(id, updates);
+
+      return Response.ok(jsonEncode({
+        'interventions': [updatedIntervention.toJson()],
+        'metadata': {}
+      }));
+    } catch (e) {
+      return Response.internalServerError(
+          body: 'interventionController: Error updating intervention: $e');
+    }
+  });
   return router;
 }
