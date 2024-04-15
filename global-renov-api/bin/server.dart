@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:shelf/shelf.dart';
 import 'package:shelf/shelf_io.dart';
+import 'package:shelf_cors_headers/shelf_cors_headers.dart';
 
 
 
@@ -9,6 +10,10 @@ import 'package:shelf/shelf_io.dart';
   final ip = InternetAddress.anyIPv4;
 
   // Configure a pipeline that logs requests.
+  final handler = const Pipeline()
+      .addMiddleware(logRequests())
+      .addMiddleware(corsHeaders(headers: overrideHeaders))
+      .addHandler(buildRouter().call);
 
   // For running in containers, we respect the PORT environment variable.
   final port = int.parse(Platform.environment['PORT'] ?? '8080');
