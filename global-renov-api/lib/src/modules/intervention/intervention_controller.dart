@@ -98,5 +98,22 @@ Router interventionController() {
           body: 'interventionController: Error fetching intervention: $e');
     }
   });
+
+  // get all interventions
+  router.get('/', (Request request) async {
+    try {
+      var interventions = await interventionService.getAllInterventions();
+      return Response.ok(jsonEncode({
+        'interventions': interventions.map((i) => i.toJson()).toList(),
+        'metadata': {
+          'total': interventions.map((i) => i.toJson()).toList().length
+        }
+      }));
+    } catch (e) {
+      return Response.internalServerError(
+          body: 'interventionController: Error fetching interventions: $e');
+    }
+  });
+
   return router;
 }

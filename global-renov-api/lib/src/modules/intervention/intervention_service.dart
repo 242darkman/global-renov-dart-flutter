@@ -1,5 +1,6 @@
 import 'package:firebase_dart/database.dart';
 import 'package:global_renov_api/src/config/firebase_service.dart';
+import 'package:global_renov_api/src/modules/address/address_model.dart';
 import 'package:global_renov_api/src/modules/intervention/intervention_model.dart';
 
 class InterventionService {
@@ -64,5 +65,31 @@ class InterventionService {
     } else {
       throw Exception('InterventionService: Intervention not found');
     }
+  }
+
+  /// Get all interventions from firebase database
+  Future<List<Intervention>> getAllInterventions() async {
+    DataSnapshot snapshot = await _firebaseService.database
+        .reference()
+        .child('interventions')
+        .once();
+    Map data = snapshot.value;
+
+    return data.entries.map((entry) {
+      Map entryData = entry.value;
+      Address address = Address(
+        street: entryData['address']['street'],
+        city: entryData['address']['city'],
+        postalCode: entryData['address']['postalCode'],
+      );
+      return Intervention(
+        id: entry.key,
+        status: entryData['status'],
+        date: entryData['date'],
+        customer: entryData['customer'],
+        address: address,
+        description: entryData['description'],
+      );
+    }).toList();
   }
 }
