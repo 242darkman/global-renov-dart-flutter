@@ -35,4 +35,18 @@ class InterventionService {
         .child(key)
         .remove();
   }
+
+  /// Change the status of an existing intervention
+  Future<Intervention> changeStatus(String id, String newStatus) async {
+    var ref =
+        _firebaseService.database.reference().child('interventions').child(id);
+    await ref.update({'status': newStatus});
+    var snapshot = await ref.get();
+    snapshot.addEntries(<String, dynamic>{'id': id}.entries);
+
+    Intervention interventionWithNewStatus =
+        Intervention.fromJson(snapshot as Map<String, dynamic>);
+
+    return interventionWithNewStatus;
+  }
 }

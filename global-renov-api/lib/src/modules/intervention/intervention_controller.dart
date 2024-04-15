@@ -45,5 +45,31 @@ Router interventionController() {
           body: 'interventionController: Error updating intervention: $e');
     }
   });
+
+  // Change the status of an existing intervention
+  router.patch('/change-status/<id>', (Request request, String id) async {
+    try {
+      String content = await request.readAsString();
+      String newStatus = jsonDecode(content)['status'];
+      List<String> statuses = ['scheduled', 'closed', 'canceled'];
+
+      if (!statuses.contains(newStatus)) {
+        return Response.internalServerError(
+            body:
+                'interventionController: Error changing intervention status: Invalid status');
+      }
+
+      var updatedIntervention =
+          await interventionService.changeStatus(id, newStatus);
+      return Response.ok(jsonEncode({
+        'interventions': [updatedIntervention.toJson()],
+        'metadata': {}
+      }));
+    } catch (e) {
+      return Response.internalServerError(
+          body:
+              'interventionController: Error changing intervention status: $e');
+    }
+  });
   return router;
 }
