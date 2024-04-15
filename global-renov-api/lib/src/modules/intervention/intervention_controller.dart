@@ -71,5 +71,17 @@ Router interventionController() {
               'interventionController: Error changing intervention status: $e');
     }
   });
+
+  // delete an intervention
+  router.delete('/delete/<id>', (Request request, String id) async {
+    try {
+      await interventionService.deleteIntervention(id);
+      return Response.ok(
+          jsonEncode({'message': 'Intervention $id deleted successfully'}));
+    } catch (e) {
+      return Response.internalServerError(
+          body: 'interventionController: Error deleting intervention: $e');
+    }
+  });
   return router;
 }
