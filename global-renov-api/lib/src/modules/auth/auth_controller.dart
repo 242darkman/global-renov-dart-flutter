@@ -83,5 +83,12 @@ Router authController() {
       return Response.internalServerError(body: 'Error signing in user');
     }
   });
+
+  router.post('/sign-out', () async {
+    await authService.signOut();
+
+    return Response.ok(jsonEncode({"message": "Signed out successfully"}));
+  });
+
   return router;
 }

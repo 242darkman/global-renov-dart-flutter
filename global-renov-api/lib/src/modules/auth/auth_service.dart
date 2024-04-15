@@ -47,4 +47,9 @@ class AuthService {
       throw Exception('AuthService: Error signing in. ${e.toString()}');
     }
   }
+
+  // Sign out the current user.
+  Future<void> signOut() async {
+    await _firebaseService.auth.signOut();
+  }
 }
