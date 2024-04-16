@@ -21,7 +21,7 @@ Router authController() {
 
       // Call your service layer to create a new user
       var result = await authService.createUserWithEmailAndPassword(
-          email, password, firstName, lastName);
+          email.toLowerCase(), password, firstName, lastName);
 
       final userResponse = {
         "id": result.user!.uid,
@@ -56,8 +56,8 @@ Router authController() {
       String password = data['password'];
 
       // Call the service layer to sign in a user
-      var result =
-          await authService.signInWithEmailAndPassword(email, password);
+      var result = await authService.signInWithEmailAndPassword(
+          email.toLowerCase(), password);
 
       // Recover the Firebase ID token
       final token = await result.user!.getIdToken();

@@ -17,7 +17,7 @@ class AuthService {
     try {
       final userCredential =
           await _firebaseService.auth.createUserWithEmailAndPassword(
-        email: email,
+        email: email.toLowerCase(),
         password: password,
       );
       String name = '$firstName $lastName';
@@ -38,7 +38,7 @@ class AuthService {
     try {
       final userCredential =
           await _firebaseService.auth.signInWithEmailAndPassword(
-        email: email,
+        email: email.toLowerCase(),
         password: password,
       );
 
@@ -54,6 +54,7 @@ class AuthService {
   }
 
   Future<void> sendPasswordResetEmail(String email) async {
-    await _firebaseService.auth.sendPasswordResetEmail(email: email);
+    await _firebaseService.auth
+        .sendPasswordResetEmail(email: email.toLowerCase());
   }
 }
