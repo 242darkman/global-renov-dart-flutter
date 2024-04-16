@@ -85,12 +85,13 @@ Router interventionController() {
   // get an intervention by ID
   router.get('/<id>', (Request request, String id) async {
     try {
-      var intervention = await interventionService.getInterventionById(id);
-      print('intervention: $intervention');
-      return Response.ok({
-        'interventions': [jsonEncode(intervention.toJson())],
+      Intervention intervention =
+          await interventionService.getInterventionById(id);
+
+      return Response.ok(jsonEncode({
+        'interventions': [intervention.toJson()],
         'metadata': {}
-      });
+      }));
     } catch (e) {
       return Response.internalServerError(
           body: 'interventionController: Error fetching intervention: $e');
