@@ -1,7 +1,7 @@
 import 'dart:convert';
 
-import 'package:shelf/shelf.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
+import 'package:shelf/shelf.dart';
 
 bool isTokenExpired(String token) {
   try {
