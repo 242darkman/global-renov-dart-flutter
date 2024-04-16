@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:global_renov_api/src/utils/exception/invalid_status_exception.dart';
 import 'package:shelf/shelf.dart';
 import 'package:shelf_router/shelf_router.dart';
 import 'package:global_renov_api/src/modules/intervention/intervention_service.dart';
@@ -22,6 +23,10 @@ Router interventionController() {
         'metadata': {}
       }));
     } catch (e) {
+      if (e is InvalidStatusException) {
+        return Response.badRequest(body: e.toString());
+      }
+
       print('interventionController: Error creating intervention: $e');
       return Response.internalServerError(
           body: 'interventionController: Error creating intervention: $e');
@@ -51,13 +56,6 @@ Router interventionController() {
     try {
       String content = await request.readAsString();
       String newStatus = jsonDecode(content)['status'];
-      List<String> statuses = ['scheduled', 'closed', 'canceled'];
-
-      if (!statuses.contains(newStatus)) {
-        return Response.internalServerError(
-            body:
-                'interventionController: Error changing intervention status: Invalid status');
-      }
 
       var updatedIntervention =
           await interventionService.changeStatus(id, newStatus);

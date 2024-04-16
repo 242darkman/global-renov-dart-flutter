@@ -1,5 +1,7 @@
 import 'package:global_renov_api/src/modules/address/address_model.dart';
 
+import 'package:global_renov_api/src/utils/exception/invalid_status_exception.dart';
+
 class Intervention {
   String? id;
   String status;
@@ -7,6 +9,7 @@ class Intervention {
   String customer;
   Address address;
   String description;
+  static const List<String> validStatuses = ['scheduled', 'closed', 'canceled'];
 
   Intervention(
       {this.id,
@@ -14,7 +17,12 @@ class Intervention {
       required this.date,
       required this.customer,
       required this.address,
-      required this.description});
+      required this.description}) {
+    if (!validStatuses.contains(status)) {
+      throw InvalidStatusException(
+          'Invalid status: $status. Status must be one of $validStatuses.');
+    }
+  }
 
   String get getStatus => status;
 
@@ -55,7 +63,7 @@ class Intervention {
 
   static Intervention fromJson(Map<String, dynamic> json) {
     return Intervention(
-      id: json['id'] as String,
+      id: json['id'] as String?,
       status: json['status'] as String,
       date: json['date'] as String,
       customer: json['customer'] as String,
