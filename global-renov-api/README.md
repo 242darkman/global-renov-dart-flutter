@@ -1,26 +1,23 @@
-A server app built using [Shelf](https://pub.dev/packages/shelf),
-configured to enable running with [Docker](https://www.docker.com/).
+# GlobalRenov' API Documentation
 
-This sample code handles HTTP GET requests to `/` and `/echo/<message>`
+## Overview
+
+This API is designed for the fictitious company GlobalRenov', which offers energy renovation services to homeowners. The API facilitates the management of service interventions, allowing users to authenticate, create, update, and track the status of interventions.
 
 # Running the sample
 
-## Running with the Dart SDK
-
-You can run the example with the [Dart SDK](https://dart.dev/get-dart)
-like this:
+## Running app
 
 ```
 $ dart run bin/server.dart
 Server listening on port 8080
 ```
 
-And then from a second terminal:
+API is available on :
 ```
-$ curl http://0.0.0.0:8080
-Hello, World!
-$ curl http://0.0.0.0:8080/echo/I_love_Dart
-I_love_Dart
+http://0.0.0.0:8080
+or
+http://localhost:8080
 ```
 
 ## Running with Docker
@@ -34,16 +31,84 @@ $ docker run -it -p 8080:8080 myserver
 Server listening on port 8080
 ```
 
-And then from a second terminal:
-```
-$ curl http://0.0.0.0:8080
-Hello, World!
-$ curl http://0.0.0.0:8080/echo/I_love_Dart
-I_love_Dart
-```
+## API Endpoints
 
-You should see the logging printed in the first terminal:
-```
-2021-05-06T15:47:04.620417  0:00:00.000158 GET     [200] /
-2021-05-06T15:47:08.392928  0:00:00.001216 GET     [200] /echo/I_love_Dart
-```
+### Authentication Routes
+
+#### POST `/auth/sign-up`
+- **Description**: Register a new user.
+- **Body**:
+  ```json
+  {
+    "email": "user@example.com",
+    "password": "securepassword",
+    "firstName": "John",
+    "lastName": "Smith"
+  }
+  ```
+- **Response**:
+  ```json
+    {
+      "users": [
+        {
+          "id": "user_id",
+          "email": "user@example.com",
+          "emailVerified": false,
+          "displayName": "John Smith"
+        }
+      ],
+      "metadata": {
+        "creationTime": "2023-01-01T00:00:00.000Z",
+        "lastSignInTime": "2023-01-01T00:00:00.000Z"
+      }
+    }
+  ```
+
+- Error:
+  - Code: 500 (Internal Server Error)
+  - Body: Error creating user
+
+
+
+#### POST `/auth/sign-in`
+- Description: Authenticate an existing user.
+- Body:
+  ```json
+  {
+    "email": "user@example.com",
+    "password": "securepassword"
+  }
+  ```
+
+- **Response**:
+  ```json
+    {
+      "users": [
+        {
+          "id": "user_id",
+          "email": "user@example.com",
+          "emailVerified": false,
+          "displayName": "John Doe"
+        }
+      ],
+      "metadata": {
+        "creationTime": "2023-01-01T00:00:00.000Z",
+        "lastSignInTime": "2023-01-01T00:00:00.000Z"
+      },
+      "token": "firebase_id_token"
+    }
+  ```
+
+- Error:
+  - Code: 500 (Internal Server Error)
+  - Body: Error signing in user
+
+
+#### POST `/auth/sign-out`
+- Description: Sign out the current user.
+- Response :
+  ```json
+    {
+      "message": "Signed out successfully"
+    }
+  ```
