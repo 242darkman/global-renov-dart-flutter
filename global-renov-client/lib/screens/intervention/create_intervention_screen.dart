@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:global_renov/screens/home.dart';
+import 'package:global_renov/screens/intervention/intervention_list_screen.dart';
 
 void main() {
   runApp(const CreateApp());
@@ -34,7 +34,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(60.0), 
+        preferredSize: const Size.fromHeight(60.0),
         child: AppBar(
           backgroundColor: const Color(0xFF55895B),
           leading: IconButton(
@@ -45,8 +45,9 @@ class _MyHomePageState extends State<MyHomePage> {
             onPressed: () {
               Navigator.push(
                 context,
-                  MaterialPageRoute(builder: (context) => const HomeApp()),
-                );
+                MaterialPageRoute(
+                    builder: (context) => const InterventionList()),
+              );
             },
           ),
           title: Row(
@@ -54,19 +55,17 @@ class _MyHomePageState extends State<MyHomePage> {
               const Text(
                 "Créer une intervention",
                 style: TextStyle(
-                  color: Colors.white, 
+                  color: Colors.white,
                 ),
               ),
             ],
-          ), 
+          ),
         ),
       ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-           
-          ],
+          children: <Widget>[],
         ),
       ),
     );
