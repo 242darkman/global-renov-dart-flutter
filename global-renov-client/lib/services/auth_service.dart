@@ -1,4 +1,5 @@
 import 'package:global_renov/utils/env.dart';
+import 'package:global_renov/utils/logger.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
@@ -15,7 +16,7 @@ class AuthService {
         return jsonDecode(response.body);
       }
     } catch (e) {
-      print('Error signing in: $e');
+      log.severe('Error signing in: $e');
       return null;
     }
     return null;
@@ -39,7 +40,7 @@ class AuthService {
         return jsonDecode(response.body);
       }
     } catch (e) {
-      print('Error signing in: $e');
+      log.severe('Error signing in: $e');
       return null;
     }
     return null;
@@ -56,7 +57,7 @@ class AuthService {
         return jsonDecode(response.body);
       }
     } catch (e) {
-      print('Error signing in: $e');
+      log.severe('Error signing in: $e');
       return null;
     }
     return null;
