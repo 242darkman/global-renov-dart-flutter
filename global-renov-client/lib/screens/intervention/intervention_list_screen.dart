@@ -1,20 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:global_renov/models/intervention_model.dart';
-import 'package:global_renov/screens/create.dart';
+import 'package:global_renov/screens/intervention/create_intervention_screen.dart';
 import 'package:global_renov/services/api.dart';
 
 void main() {
-  runApp(const HomeApp());
+  runApp(const InterventionList());
 }
 
-class HomeApp extends StatefulWidget {
-  const HomeApp({super.key});
+class InterventionList extends StatefulWidget {
+  const InterventionList({super.key});
 
   @override
-  State<HomeApp> createState() => _HomeAppState();
+  State<InterventionList> createState() => _InterventionListState();
 }
 
-class _HomeAppState extends State<HomeApp> {
+class _InterventionListState extends State<InterventionList> {
   late Future<List<Intervention>> futureIntervention;
 
   @override
