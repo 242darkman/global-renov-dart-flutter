@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:global_renov_api/src/utils/exception/invalid_status_exception.dart';
+import 'package:global_renov_api/src/utils/logger/logger.dart';
 import 'package:shelf/shelf.dart';
 import 'package:shelf_router/shelf_router.dart';
 import 'package:global_renov_api/src/modules/intervention/intervention_service.dart';
@@ -27,7 +28,7 @@ Router interventionController() {
         return Response.badRequest(body: e.toString());
       }
 
-      print('interventionController: Error creating intervention: $e');
+      log.severe('interventionController: Error creating intervention: $e');
       return Response.internalServerError(
           body: 'interventionController: Error creating intervention: $e');
     }
@@ -46,6 +47,7 @@ Router interventionController() {
         'metadata': {}
       }));
     } catch (e) {
+      log.severe('interventionController: Error updating intervention: $e');
       return Response.internalServerError(
           body: 'interventionController: Error updating intervention: $e');
     }
@@ -64,6 +66,8 @@ Router interventionController() {
         'metadata': {}
       }));
     } catch (e) {
+      log.severe(
+          'interventionController: Error changing intervention status: $e');
       return Response.internalServerError(
           body:
               'interventionController: Error changing intervention status: $e');
@@ -77,6 +81,7 @@ Router interventionController() {
       return Response.ok(
           jsonEncode({'message': 'Intervention $id deleted successfully'}));
     } catch (e) {
+      log.severe('interventionController: Error deleting intervention: $e');
       return Response.internalServerError(
           body: 'interventionController: Error deleting intervention: $e');
     }
@@ -93,6 +98,7 @@ Router interventionController() {
         'metadata': {}
       }));
     } catch (e) {
+      log.severe('interventionController: Error fetching intervention: $e');
       return Response.internalServerError(
           body: 'interventionController: Error fetching intervention: $e');
     }
@@ -109,6 +115,7 @@ Router interventionController() {
         }
       }));
     } catch (e) {
+      log.severe('interventionController: Error fetching interventions: $e');
       return Response.internalServerError(
           body: 'interventionController: Error fetching interventions: $e');
     }

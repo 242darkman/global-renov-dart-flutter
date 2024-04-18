@@ -1,5 +1,6 @@
 import 'package:firebase_dart/firebase_dart.dart';
 import 'package:global_renov_api/src/config/firebase_service.dart';
+import 'package:global_renov_api/src/utils/logger/logger.dart';
 
 class AuthService {
   final FirebaseService _firebaseService = FirebaseService();
@@ -26,6 +27,7 @@ class AuthService {
 
       return userCredential;
     } catch (e) {
+      log.severe('AuthService: Error creating user. ${e.toString()}');
       throw Exception('AuthService: Error creating user. ${e.toString()}');
     }
   }
@@ -44,6 +46,7 @@ class AuthService {
 
       return userCredential;
     } catch (e) {
+      log.severe('AuthService: Error signing in. ${e.toString()}');
       throw Exception('AuthService: Error signing in. ${e.toString()}');
     }
   }

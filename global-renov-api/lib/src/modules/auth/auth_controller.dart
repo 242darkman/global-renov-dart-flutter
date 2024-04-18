@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:shelf/shelf.dart';
 import 'package:shelf_router/shelf_router.dart';
 import 'package:global_renov_api/src/modules/auth/auth_service.dart';
+import 'package:global_renov_api/src/utils/logger/logger.dart';
 
 Router authController() {
   final router = Router();
@@ -39,8 +40,7 @@ Router authController() {
         }
       }));
     } catch (e) {
-      // Handle the exception, e.g., log it or return an error response
-      print('Error creating user: $e');
+      log.severe('Error creating user: $e');
       return Response.internalServerError(body: 'Error creating user');
     }
   });
@@ -79,7 +79,7 @@ Router authController() {
         "token": token
       }));
     } catch (e) {
-      print('Error signing in user: $e');
+      log.severe('Error signing in user: $e');
       return Response.internalServerError(body: 'Error signing in user');
     }
   });
