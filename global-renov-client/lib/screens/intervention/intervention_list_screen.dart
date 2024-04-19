@@ -1,191 +1,183 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:global_renov/models/intervention_model.dart';
 import 'package:global_renov/screens/intervention/create_intervention_screen.dart';
-import 'package:global_renov/services/api.dart';
+import 'package:global_renov/services/intervention_service.dart';
+import 'package:global_renov/utils/intervention_functions.dart';
+import 'package:global_renov/utils/logger.dart';
+import 'package:global_renov/widgets/custom_loading.dart';
 
-void main() {
-  runApp(const InterventionList());
-}
-
-class InterventionList extends StatefulWidget {
-  const InterventionList({super.key});
+class InterventionListScreen extends StatefulWidget {
+  const InterventionListScreen({super.key});
 
   @override
-  State<InterventionList> createState() => _InterventionListState();
+  InterventionListScreenState createState() => InterventionListScreenState();
 }
 
-class _InterventionListState extends State<InterventionList> {
-  late Future<List<Intervention>> futureIntervention;
+class InterventionListScreenState extends State<InterventionListScreen> {
+  late Future<Map<String, dynamic>?> _futureIntervention;
 
   @override
   void initState() {
     super.initState();
-    futureIntervention = fetchInterventions();
+    _futureIntervention = InterventionService().fetchInterventions();
   }
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-        theme: ThemeData(
-          useMaterial3: true,
+    return PlatformScaffold(
+      appBar: PlatformAppBar(
+        material: (_, __) => MaterialAppBarData(
+          backgroundColor: const Color(0xFF55895B),
         ),
-        debugShowCheckedModeBanner: false,
-        home: newMethod(context));
-  }
-
-  Scaffold newMethod(BuildContext context) {
-    return Scaffold(
-        appBar: PreferredSize(
-          preferredSize: const Size.fromHeight(60.0),
-          child: AppBar(
-            backgroundColor: const Color(0xFF55895B),
-            leading: IconButton(
-              icon: const Icon(
-                Icons.arrow_back_ios,
-                color: Colors.white,
-              ),
-              onPressed: () {},
+        title: Text(
+          "Interventions",
+          style: platformThemeData(
+            context,
+            material: (data) => const TextStyle(color: Colors.white),
+            cupertino: (data) => const TextStyle(color: CupertinoColors.white),
+          ),
+        ),
+        trailingActions: <Widget>[
+          PlatformIconButton(
+            icon: Icon(
+              PlatformIcons(context).add,
+              color: const Color(0xFF55895B),
             ),
-            title: Row(
+            onPressed: () => Navigator.push(
+              context,
+              platformPageRoute(
+                context: context,
+                builder: (context) => const CreateInterventionScreen(),
+              ),
+            ),
+            material: (_, __) => MaterialIconButtonData(
+              icon: Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Icon(
+                  PlatformIcons(context).add,
+                  color: const Color(0xFF55895B),
+                ),
+              ),
+            ),
+            cupertino: (_, __) => CupertinoIconButtonData(
+              icon: Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Icon(
+                  PlatformIcons(context).add,
+                  color: const Color(0xFF55895B),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+      body: ListInterventions(futureIntervention: _futureIntervention),
+    );
+  }
+}
+
+class ListInterventions extends StatelessWidget {
+  final Future<Map<String, dynamic>?> futureIntervention;
+
+  const ListInterventions({super.key, required this.futureIntervention});
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<Map<String, dynamic>?>(
+      future: futureIntervention,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const CustomLoadingIndicator();
+        }
+
+        if (snapshot.hasError) {
+          log.severe('Error: ${snapshot.error}');
+          return Text('Error: ${snapshot.error}');
+        }
+
+        if (!snapshot.hasData || (snapshot.data?['interventions'] is! List)) {
+          log.severe('No interventions found');
+          return const Text('No interventions found');
+        }
+
+        var interventions = (snapshot.data!['interventions'] as List)
+            .map((i) => Intervention.fromJson(i))
+            .toList();
+
+        return ListView.builder(
+          itemCount: interventions.length,
+          itemBuilder: (context, index) {
+            return interventionCard(context, interventions[index]);
+          },
+        );
+      },
+    );
+  }
+}
+
+Widget interventionCard(BuildContext context, Intervention intervention) {
+  return Card(
+    shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+    elevation: 4,
+    margin: const EdgeInsets.only(top: 20),
+    child: Padding(
+      padding: const EdgeInsets.all(20.0),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  "Interventions",
-                  style: TextStyle(
-                    color: Colors.white,
+                Container(
+                  margin: const EdgeInsets.only(bottom: 4),
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: getStatusColor(intervention.status),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Text(
+                    translateStatus(intervention.status),
+                    style: const TextStyle(color: Colors.white),
                   ),
                 ),
-                const Spacer(),
-                Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 10.0),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(8.0),
-                    color: Colors.white,
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 4),
+                  child: Text(
+                    formatDateTime(intervention.date),
+                    style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
-                  child: IconButton(
-                    icon: const Icon(
-                      Icons.add,
-                      color: Color(0xFF55895B),
-                    ),
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const CreateApp()),
-                      );
-                    },
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 4),
+                  child: Text(intervention.customer),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 4),
+                  child: Text(
+                    "${intervention.address.street} ${intervention.address.postalCode} ${intervention.address.city}",
+                    style: TextStyle(color: Colors.grey[500]),
                   ),
                 ),
               ],
             ),
           ),
-        ),
-        body: ListInterventions(futureIntervention: futureIntervention));
-  }
-}
-
-class ListInterventions extends StatelessWidget {
-  const ListInterventions({
-    super.key,
-    required this.futureIntervention,
-  });
-
-  final Future<List<Intervention>> futureIntervention;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-        color: Colors.white,
-        child: FutureBuilder<List<Intervention>>(
-            future: futureIntervention,
-            builder: (context, snapshot) {
-              if (snapshot.hasData) {
-                return ListView.builder(
-                    itemCount: snapshot.data!.length,
-                    itemBuilder: (context, index) => Card(
-                          shape: const RoundedRectangleBorder(
-                            borderRadius: BorderRadius.zero,
-                          ),
-                          surfaceTintColor: Colors.white,
-                          color: Colors.white,
-                          elevation: 4,
-                          margin: const EdgeInsets.only(top: 20),
-                          child: Padding(
-                            padding: const EdgeInsets.all(20.0),
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Container(
-                                        margin:
-                                            const EdgeInsets.only(bottom: 4),
-                                        padding: const EdgeInsets.all(8),
-                                        decoration: BoxDecoration(
-                                          color: _getStatusColor(
-                                              snapshot.data![index].status),
-                                          borderRadius:
-                                              BorderRadius.circular(8),
-                                        ),
-                                        child: Text(
-                                          snapshot.data![index].status,
-                                          style: const TextStyle(
-                                              color: Colors.white),
-                                        ),
-                                      ),
-                                      Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                            vertical: 4),
-                                        child: Text(
-                                          snapshot.data![index].date,
-                                          style: const TextStyle(
-                                              fontWeight: FontWeight.bold),
-                                        ),
-                                      ),
-                                      Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                            vertical: 4),
-                                        child: Text(
-                                            snapshot.data![index].customer),
-                                      ),
-                                      Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                            vertical: 4),
-                                        child: Text(
-                                          "${snapshot.data![index].address.street} ${snapshot.data![index].address.postalCode} ${snapshot.data![index].address.city} ",
-                                          style: TextStyle(
-                                              color: Colors.grey[500]),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                IconButton(
-                                  icon: const Icon(Icons.arrow_forward_ios),
-                                  color: const Color(0xFF022606),
-                                  onPressed: () {},
-                                ),
-                              ],
-                            ),
-                          ),
-                        ));
-              } else if (snapshot.hasError) {
-                return Text("Erreur : ${snapshot.error}");
-              }
-              return const CircularProgressIndicator();
-            }));
-  }
-}
-
-Color _getStatusColor(String status) {
-  switch (status) {
-    case "Programmé":
-      return const Color(0xFF51BEE0);
-    case "Annulé":
-      return const Color(0xFF7D949B);
-    default:
-      return const Color(0xFF84CD8D);
-  }
+          PlatformIconButton(
+            icon: Icon(PlatformIcons(context).forward),
+            onPressed: () {},
+          ),
+        ],
+      ),
+    ),
+  );
 }
