@@ -12,6 +12,41 @@ class InterventionService {
   }
 
 
+  /// Asynchronously deletes an intervention with the given [idIntervention].
+  ///
+  /// Sends a DELETE request to the API endpoint `${Environment.apiUrl}/interventions/delete/$idIntervention`
+  /// with the necessary headers, including the authorization token obtained from `PreferenceService.getToken()`.
+  ///
+  /// If the request is successful (status code 200), the function returns the decoded response body as a `Map<String, dynamic>`.
+  /// If an error occurs during the request, the function prints the error and returns `null`.
+  ///
+  /// Parameters:
+  /// - `idIntervention`: The ID of the intervention to be deleted.
+  ///
+  /// Returns a `Future<Map<String, dynamic>?>` representing the result of the API call.
+  Future<Map<String, dynamic>?> deleteAnIntervention(
+      String idIntervention) async {
+    try {
+      final response = await http.delete(
+        Uri.parse('${Environment.apiUrl}/interventions/delete/$idIntervention'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $authToken',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        return jsonDecode(response.body);
+      }
+
+      return null;
+    } catch (e) {
+      print('Error deleting intervention: $e');
+      log.severe('Error deleting intervention: $e');
+      return null;
+    }
+  }
+
   /// Asynchronously retrieves a single intervention by [idIntervention].
   ///
   /// Sends a GET request to the API endpoint `${Environment.apiUrl}/interventions/$idIntervention`
@@ -46,6 +81,7 @@ class InterventionService {
 
     return null;
   }
+
   /// Retrieves all interventions asynchronously.
   ///
   /// Sends a GET request to the API endpoint `${Environment.apiUrl}/interventions`.
