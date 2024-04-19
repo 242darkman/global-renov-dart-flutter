@@ -13,8 +13,8 @@ The objective of the project is to provide an application that manages the inter
 * Brandon VOUVOU
 
 ## Technologies Used
-- **Flutter and Dart**: For client-side.
-- **Dart**: Used for backend development.
+- **Flutter 3.19**: For client-side.
+- **Dart 3.3**: Used for backend development.
 
 ## Features
 
