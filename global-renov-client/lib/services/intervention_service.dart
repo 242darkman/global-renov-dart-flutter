@@ -1,3 +1,4 @@
+import 'package:global_renov/models/address_model.dart';
 import 'package:global_renov/utils/env.dart';
 import 'package:global_renov/utils/logger.dart';
 import 'package:global_renov/utils/shared_preferences.dart';
@@ -11,6 +12,47 @@ class InterventionService {
     authToken = PreferenceService.getToken();
   }
 
+  /// Creates an intervention with the given [status], [date], [customer], [address], and [description].
+  ///
+  /// The function sends a POST request to the API endpoint `${Environment.apiUrl}/interventions/create` with the provided data.
+  /// The request includes the necessary headers, including the authorization token obtained from `PreferenceService.getToken()`.
+  ///
+  /// If the request is successful (status code 200), the function returns the decoded response body as a `Map<String, dynamic>`.
+  /// If an error occurs during the request, the function prints the error and returns `null`.
+  ///
+  /// Returns a `Future<Map<String, dynamic>?>` representing the result of the API call.
+  Future<Map<String, dynamic>?> createIntervention(
+    String status,
+    String date,
+    String customer,
+    Address address,
+    String description,
+  ) async {
+    try {
+      final response = await http.post(
+        Uri.parse('${Environment.apiUrl}/interventions/create'),
+        body: jsonEncode({
+          'status': status,
+          'date': date,
+          'customer': customer,
+          'address': address,
+          'description': description
+        }),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $authToken',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        return jsonDecode(response.body);
+      }
+    } catch (e) {
+      log.severe('Error creating intervention: $e');
+      return null;
+    }
+    return null;
+  }
 
   /// Updates an intervention with the given [idIntervention] and [changes].
   ///
