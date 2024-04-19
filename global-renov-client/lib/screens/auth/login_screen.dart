@@ -4,6 +4,7 @@ import 'package:global_renov/screens/auth/register_screen.dart';
 import 'package:global_renov/screens/intervention/intervention_list_screen.dart';
 import 'package:global_renov/services/auth_service.dart';
 import 'package:global_renov/state/app_state.dart';
+import 'package:global_renov/utils/shared_preferences.dart';
 import 'package:provider/provider.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -16,6 +17,7 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  bool _isLoading = false;
 
   static const Color _formContainerColor = Colors.white;
   static const Color _buttonColor = Color(0xFF55895B);
@@ -116,11 +118,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Widget _buildLoginButton(AuthService authService) {
     return PlatformElevatedButton(
-      child: const Text(
-        'Se connecter',
-        style: TextStyle(color: Colors.white),
-      ),
-      onPressed: () => _handleLogin(authService),
+      onPressed: _isLoading ? null : () => _handleLogin(authService),
       material: (_, __) => MaterialElevatedButtonData(
         style: ElevatedButton.styleFrom(
           backgroundColor: _buttonColor,
@@ -133,6 +131,20 @@ class _LoginScreenState extends State<LoginScreen> {
         color: _buttonColor,
         borderRadius: BorderRadius.circular(5.0),
       ),
+      child: _isLoading
+          ? const SizedBox(
+              width: 20,
+              height: 20,
+              child: CircularProgressIndicator(
+                valueColor: AlwaysStoppedAnimation<Color>(_buttonColor),
+                strokeWidth: 2.0,
+                backgroundColor: Colors.white,
+              ),
+            )
+          : const Text(
+              'Se connecter',
+              style: TextStyle(color: Colors.white),
+            ),
     );
   }
 
@@ -162,19 +174,35 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   void _handleLogin(AuthService authService) async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    if (_emailController.text.isEmpty || _passwordController.text.isEmpty) {
+      _showErrorDialog(
+          'Veuillez renseigner l\'adresse email et le mot de passe.');
+    }
+
     try {
       var result = await authService.signIn(
-          _emailController.text, _passwordController.text);
+          _emailController.text.trim(), _passwordController.text.trim());
       if (result != null) {
         Provider.of<AppState>(context, listen: false).setUser(result);
-        Navigator.pushReplacement(context,
-            MaterialPageRoute(builder: (context) => const InterventionList()));
+        await PreferenceService.setToken(result['token']);
+        Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+                builder: (context) => const InterventionListScreen()));
       } else {
         _showErrorDialog(
             'Informations d\'identification non valides. Veuillez réessayer.');
       }
     } catch (e) {
       _showErrorDialog('Erreur de connexion: ${e.toString()}');
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
     }
   }
 

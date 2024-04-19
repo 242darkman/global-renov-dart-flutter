@@ -9,14 +9,15 @@ class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
 
   @override
-  _RegisterScreenState createState() => _RegisterScreenState();
+  RegisterScreenState createState() => RegisterScreenState();
 }
 
-class _RegisterScreenState extends State<RegisterScreen> {
+class RegisterScreenState extends State<RegisterScreen> {
   final TextEditingController _firstNameController = TextEditingController();
   final TextEditingController _lastNameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  bool _isLoading = false;
 
   static const Color _formContainerColor = Colors.white;
   static const Color _buttonColor = Color(0xFF55895B);
@@ -85,7 +86,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         decoration: InputDecoration(
           border: const UnderlineInputBorder(),
           labelText: 'Email',
-          prefixIcon: Icon(Icons.email),
+          prefixIcon: const Icon(Icons.email),
           hintText: 'Saisissez un e-mail valide',
           errorText:
               _validateEmail(_emailController.text) ? null : 'Email invalide',
@@ -121,7 +122,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
               errorText: _validatePassword(_passwordController.text)
                   ? null
                   : 'Mot de passe faible',
-              prefixIcon: Icon(Icons.lock_outline),
+              prefixIcon: const Icon(Icons.lock_outline),
             ),
           ),
           cupertino: (_, __) => CupertinoTextFieldData(
@@ -202,7 +203,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   Widget _buildRegisterButton(AuthService authService) {
     return PlatformElevatedButton(
-      onPressed: () => _handleRegistration(authService),
+      onPressed: _isLoading ? null : () => _handleRegistration(authService),
       material: (_, __) => MaterialElevatedButtonData(
         style: ElevatedButton.styleFrom(
           backgroundColor: _buttonColor,
@@ -215,10 +216,20 @@ class _RegisterScreenState extends State<RegisterScreen> {
         color: _buttonColor,
         borderRadius: BorderRadius.circular(5.0),
       ),
-      child: const Text(
-        'Créer mon compte',
-        style: TextStyle(color: Colors.white),
-      ),
+      child: _isLoading
+          ? const SizedBox(
+              width: 20,
+              height: 20,
+              child: CircularProgressIndicator(
+                valueColor: AlwaysStoppedAnimation<Color>(_buttonColor),
+                strokeWidth: 2.0,
+                backgroundColor: Colors.white,
+              ),
+            )
+          : const Text(
+              'Créer mon compte',
+              style: TextStyle(color: Colors.white),
+            ),
     );
   }
 
@@ -247,6 +258,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
   }
 
   void _handleRegistration(AuthService authService) async {
+    setState(() {
+      _isLoading = true;
+    });
+
     try {
       var result = await authService.createAccount(
           _emailController.text,
@@ -262,6 +277,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
       }
     } catch (e) {
       _showErrorDialog('Erreur de connexion: ${e.toString()}');
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
     }
   }
 
