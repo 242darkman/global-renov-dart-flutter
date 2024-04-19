@@ -35,7 +35,7 @@ class InterventionService {
           'status': status,
           'date': date,
           'customer': customer,
-          'address': address,
+          'address': address.toJson(),
           'description': description
         }),
         headers: {
