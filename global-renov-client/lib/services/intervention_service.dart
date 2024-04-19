@@ -12,6 +12,43 @@ class InterventionService {
   }
 
 
+  /// Updates an intervention with the given [idIntervention] and [changes].
+  ///
+  /// The function sends a PUT request to the API endpoint `${Environment.apiUrl}/interventions/update/$idIntervention`
+  /// with the provided [changes]. The request includes the necessary headers, including the authorization token obtained
+  /// from `PreferenceService.getToken()`.
+  ///
+  /// If the request is successful (status code 200), the function returns the decoded response body as a `Map<String, dynamic>`.
+  /// If an error occurs during the request, the function prints the error and returns `null`.
+  ///
+  /// Parameters:
+  /// - `idIntervention`: The ID of the intervention to be updated.
+  /// - `changes`: The changes to be applied to the intervention.
+  ///
+  /// Returns a `Future<Map<String, dynamic>?>` representing the result of the API call.
+  Future<Map<String, dynamic>?> updateAnIntervention(
+      String idIntervention, Map<String, dynamic> changes) async {
+    try {
+      final response = await http.put(
+        Uri.parse('${Environment.apiUrl}/interventions/update/$idIntervention'),
+        body: jsonEncode(changes),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $authToken',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        return jsonDecode(response.body);
+      }
+    } catch (e) {
+      log.severe('Error updating intervention: $e');
+      return null;
+    }
+
+    return null;
+  }
+
   /// Asynchronously changes the status of an intervention with the given [status] and [idIntervention].
   ///
   /// Sends a PATCH request to the API endpoint `${Environment.apiUrl}/interventions/change-status/$idIntervention`
