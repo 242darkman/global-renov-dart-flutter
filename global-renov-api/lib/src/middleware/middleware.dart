@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:shelf/shelf.dart';
+import 'package:global_renov_api/src/utils/logger/logger.dart';
 
 bool isTokenExpired(String token) {
   try {
@@ -9,7 +10,7 @@ bool isTokenExpired(String token) {
 
     return isTokenExpired;
   } catch (e) {
-    print('Error verifying token: $e');
+    log.severe('Error verifying token: $e');
     return true;
   }
 }

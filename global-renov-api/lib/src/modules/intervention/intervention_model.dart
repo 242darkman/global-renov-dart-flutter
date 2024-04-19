@@ -1,6 +1,7 @@
 import 'package:global_renov_api/src/modules/address/address_model.dart';
 
 import 'package:global_renov_api/src/utils/exception/invalid_status_exception.dart';
+import 'package:global_renov_api/src/utils/logger/logger.dart';
 
 class Intervention {
   String? id;
@@ -19,6 +20,8 @@ class Intervention {
       required this.address,
       required this.description}) {
     if (!validStatuses.contains(status)) {
+      log.severe(
+          'Invalid status: $status. Status must be one of $validStatuses.');
       throw InvalidStatusException(
           'Invalid status: $status. Status must be one of $validStatuses.');
     }

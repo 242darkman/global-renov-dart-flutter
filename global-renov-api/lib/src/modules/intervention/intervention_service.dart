@@ -2,6 +2,7 @@ import 'package:firebase_dart/database.dart';
 import 'package:global_renov_api/src/config/firebase_service.dart';
 import 'package:global_renov_api/src/modules/address/address_model.dart';
 import 'package:global_renov_api/src/modules/intervention/intervention_model.dart';
+import 'package:global_renov_api/src/utils/logger/logger.dart';
 
 class InterventionService {
   final FirebaseService _firebaseService = FirebaseService();
@@ -63,6 +64,7 @@ class InterventionService {
       snapshot.addEntries(<String, dynamic>{'id': id}.entries);
       return Intervention.fromJson(snapshot as Map<String, dynamic>);
     } else {
+      log.warning('InterventionService: Intervention not found');
       throw Exception('InterventionService: Intervention not found');
     }
   }
