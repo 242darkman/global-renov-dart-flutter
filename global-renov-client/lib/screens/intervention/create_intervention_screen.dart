@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:global_renov/screens/intervention/intervention_list_screen.dart';
 
 void main() {
-  runApp(const CreateApp());
+  runApp(const CreateInterventionScreen());
 }
 
-class CreateApp extends StatelessWidget {
-  const CreateApp({super.key});
+class CreateInterventionScreen extends StatelessWidget {
+  const CreateInterventionScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -46,13 +46,13 @@ class _MyHomePageState extends State<MyHomePage> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                    builder: (context) => const InterventionList()),
+                    builder: (context) => const InterventionListScreen()),
               );
             },
           ),
-          title: Row(
+          title: const Row(
             children: [
-              const Text(
+              Text(
                 "Créer une intervention",
                 style: TextStyle(
                   color: Colors.white,
@@ -62,7 +62,7 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
         ),
       ),
-      body: Center(
+      body: const Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[],
