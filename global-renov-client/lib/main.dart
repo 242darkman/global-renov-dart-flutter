@@ -8,7 +8,7 @@ import 'state/app_state.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await PreferenceService.init();
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -25,7 +25,7 @@ class MyApp extends StatelessWidget {
         title: 'Global\'Renov',
         debugShowCheckedModeBanner: false,
         theme: ThemeData(),
-        home: LoginScreen(),
+        home: const LoginScreen(),
       ),
     );
   }
