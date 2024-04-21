@@ -119,6 +119,12 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget _buildLoginButton(AuthService authService) {
     return PlatformElevatedButton(
       onPressed: _isLoading ? null : () => _handleLogin(authService),
+      // onPressed: () {
+      //   Navigator.push(
+      //     context,
+      //     MaterialPageRoute(builder: (context) => const InterventionListScreen()), // a supprimer
+      //   );
+      // },
       material: (_, __) => MaterialElevatedButtonData(
         style: ElevatedButton.styleFrom(
           backgroundColor: _buttonColor,

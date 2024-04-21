@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:global_renov/models/intervention_model.dart';
 import 'package:global_renov/screens/intervention/create_intervention_screen.dart';
+import 'package:global_renov/screens/intervention/details_intervention_screen.dart';
 import 'package:global_renov/services/intervention_service.dart';
 import 'package:global_renov/utils/intervention_functions.dart';
 import 'package:global_renov/utils/logger.dart';
@@ -156,7 +157,8 @@ Widget interventionCard(BuildContext context, Intervention intervention) {
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 4),
                   child: Text(
-                    formatDateTime(intervention.date),
+                    //formatDateTime(intervention.date),
+                    formatDateTime(intervention.date, outputFormat: 'dd/M/yyyy'),
                     style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
                 ),
@@ -176,7 +178,13 @@ Widget interventionCard(BuildContext context, Intervention intervention) {
           ),
           PlatformIconButton(
             icon: Icon(PlatformIcons(context).forward),
-            onPressed: () {},
+            onPressed: () {
+             
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => DetailsInterventionScreen(idIntervention: intervention.id))
+              );
+            },
           ),
         ],
       ),
