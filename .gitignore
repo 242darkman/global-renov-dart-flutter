@@ -274,5 +274,11 @@ $RECYCLE.BIN/
 # Windows shortcuts
 *.lnk
 
+.vscode
+
+.global-renov-client/.vscode
+
+.global-renov-client/.idea
+
 # End of https://www.toptal.com/developers/gitignore/api/visualstudiocode,jetbrains+all,dart,flutter,macos,windows,linux
 
