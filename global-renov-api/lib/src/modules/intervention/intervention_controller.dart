@@ -58,13 +58,20 @@ Router interventionController() {
     try {
       String content = await request.readAsString();
       String newStatus = jsonDecode(content)['status'];
+      List<String> validStatuses = ['scheduled', 'closed', 'canceled'];
 
-      var updatedIntervention =
-          await interventionService.changeStatus(id, newStatus);
-      return Response.ok(jsonEncode({
-        'interventions': [updatedIntervention.toJson()],
-        'metadata': {}
-      }));
+      if (validStatuses.contains(newStatus)) {
+        var updatedIntervention =
+            await interventionService.changeStatus(id, newStatus);
+
+        return Response.ok(jsonEncode({
+          'interventions': [updatedIntervention.toJson()],
+          'metadata': {}
+        }));
+      }
+
+      return Response.badRequest(
+          body: 'interventionController: Invalid status: $newStatus');
     } catch (e) {
       log.severe(
           'interventionController: Error changing intervention status: $e');
