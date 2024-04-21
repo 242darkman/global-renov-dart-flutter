@@ -54,6 +54,22 @@ Color getStatusColor(String status) {
 /// This function throws a `FormatException` if the [input] is not a `String` or a `DateTime` object.
 ///
 /// Returns the formatted date and time as a `String`.
+
+//DEBUT,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+// String formatDateTime(dynamic input,
+//     {String inputFormat = '', String outputFormat = 'dd/MM/yyyy'}) {
+//   if (input is! String && input is! DateTime) {
+//     throw const FormatException('Input must be a String or DateTime');
+//   }
+
+//   if (input is String) {
+//     return formatStringDate(input, inputFormat, outputFormat);
+//   }
+
+//   return DateFormat(outputFormat).format(input);
+// }
+
+// fin,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 String formatDateTime(dynamic input,
     {String inputFormat = '', String outputFormat = 'dd/MM/yyyy'}) {
   if (input is! String && input is! DateTime) {
@@ -61,11 +77,19 @@ String formatDateTime(dynamic input,
   }
 
   if (input is String) {
-    return formatStringDate(input, inputFormat, outputFormat);
+    // Vérifier si le format d'entrée est "yyyy-MM-dd"
+    if (RegExp(r'^\d{4}-\d{2}-\d{2}$').hasMatch(input)) {
+      return formatStringDate(input, 'yyyy-MM-dd', outputFormat);
+    }
+    // Sinon, supposer que le format d'entrée est "dd/MM/yyyy"
+    else {
+      return formatStringDate(input, 'dd/MM/yyyy', outputFormat);
+    }
   }
 
   return DateFormat(outputFormat).format(input);
 }
+
 
 // Formats the given [date] String into a DateTime object using the provided [inputFormat]. If [inputFormat] is empty, the default format is used.
 // Then, formats the parsed date into a string with the specified [outputFormat] and returns it.

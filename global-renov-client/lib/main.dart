@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:global_renov/screens/auth/login_screen.dart';
 import 'package:global_renov/utils/shared_preferences.dart';
 import 'package:provider/provider.dart';
+
 import 'services/auth_service.dart';
+import 'services/intervention_service.dart';
 import 'state/app_state.dart';
 
 void main() async {
@@ -20,6 +22,7 @@ class MyApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(create: (context) => AppState()),
         Provider(create: (context) => AuthService()),
+        Provider(create: (context) => InterventionService()),
       ],
       child: MaterialApp(
         title: 'Global\'Renov',
