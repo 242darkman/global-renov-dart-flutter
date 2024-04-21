@@ -129,6 +129,8 @@ Widget interventionCard(BuildContext context, Intervention intervention) {
   return Card(
     shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
     elevation: 4,
+    surfaceTintColor: Colors.white,
+    color: Colors.white,
     margin: const EdgeInsets.only(top: 20),
     child: Padding(
       padding: const EdgeInsets.all(20.0),
