@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:global_renov/models/intervention_model.dart';
-import 'package:global_renov/screens/intervention/create_intervention_screen.dart';
+import 'package:global_renov/screens/intervention/create_edit_intervention_screen.dart';
 import 'package:global_renov/screens/intervention/details_intervention_screen.dart';
 import 'package:global_renov/services/intervention_service.dart';
 import 'package:global_renov/utils/intervention_functions.dart';
@@ -50,7 +50,7 @@ class InterventionListScreenState extends State<InterventionListScreen> {
               context,
               platformPageRoute(
                 context: context,
-                builder: (context) => const CreateInterventionScreen(),
+                builder: (context) => const CreateEditInterventionScreen(),
               ),
             ),
             material: (_, __) => MaterialIconButtonData(
