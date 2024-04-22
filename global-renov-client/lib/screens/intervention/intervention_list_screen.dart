@@ -157,8 +157,8 @@ Widget interventionCard(BuildContext context, Intervention intervention) {
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 4),
                   child: Text(
-                    //formatDateTime(intervention.date),
-                    formatDateTime(intervention.date, outputFormat: 'dd/M/yyyy'),
+                    formatDateTime(intervention.date,
+                        outputFormat: 'dd/M/yyyy'),
                     style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
                 ),
@@ -179,11 +179,11 @@ Widget interventionCard(BuildContext context, Intervention intervention) {
           PlatformIconButton(
             icon: Icon(PlatformIcons(context).forward),
             onPressed: () {
-             
               Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => DetailsInterventionScreen(idIntervention: intervention.id))
-              );
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => DetailsInterventionScreen(
+                          idIntervention: intervention.id)));
             },
           ),
         ],
