@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
+import 'package:global_renov/screens/intervention/create_edit_intervention_screen.dart';
 import 'package:global_renov/screens/intervention/intervention_list_screen.dart';
 import 'package:global_renov/services/intervention_service.dart';
 import 'package:global_renov/state/intervention_state.dart';
@@ -84,7 +85,10 @@ class DetailsInterventionScreenState extends State<DetailsInterventionScreen> {
                               idIntervention: widget.idIntervention)));
                 }),
                 const SizedBox(width: 13),
-                _buildActionButton(Icons.delete, Colors.red, () {}),
+                _buildActionButton(Icons.delete, Colors.red, () {
+                  _showDeleteConfirmation(
+                      context, interventionService, widget.idIntervention);
+                }),
               ],
             ),
             const SizedBox(height: 32),
@@ -389,6 +393,57 @@ class DetailsInterventionScreenState extends State<DetailsInterventionScreen> {
         ],
       ),
     );
+  }
+
+  void _showDeleteConfirmation(BuildContext context,
+      InterventionService interventionService, String idIntervention) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return PlatformAlertDialog(
+          title: const Text('Confirmer la suppression'),
+          content: const Text(
+              'Êtes-vous sûr de vouloir supprimer cette intervention?'),
+          actions: <Widget>[
+            PlatformDialogAction(
+              child: PlatformText('Annuler'),
+              onPressed: () => Navigator.of(context).pop(),
+            ),
+            PlatformDialogAction(
+              child: PlatformText('Supprimer'),
+              onPressed: () {
+                Navigator.of(context).pop();
+                _deleteIntervention(interventionService, idIntervention);
+
+                Navigator.push(
+                  context,
+                  platformPageRoute(
+                    context: context,
+                    builder: (context) => const InterventionListScreen(),
+                  ),
+                );
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _deleteIntervention(
+      InterventionService interventionService, String idIntervention) async {
+    setState(() {
+      _isLoading = true;
+    });
+    try {
+      await interventionService.deleteAnIntervention(idIntervention);
+    } catch (e) {
+      _showErrorDialog('Erreur lors de la suppression: ${e.toString()}');
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
   }
 
   void _handleActionIntervention(
