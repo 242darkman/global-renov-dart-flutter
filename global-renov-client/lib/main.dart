@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:global_renov/screens/auth/login_screen.dart';
+import 'package:global_renov/state/intervention_state.dart';
 import 'package:global_renov/utils/shared_preferences.dart';
 import 'package:provider/provider.dart';
 
@@ -23,6 +24,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (context) => AppState()),
         Provider(create: (context) => AuthService()),
         Provider(create: (context) => InterventionService()),
+        ChangeNotifierProvider(create: (context) => InterventionState())
       ],
       child: MaterialApp(
         title: 'Global\'Renov',
