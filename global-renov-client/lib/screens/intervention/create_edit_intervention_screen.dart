@@ -2,28 +2,51 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:global_renov/models/address_model.dart';
+import 'package:global_renov/screens/intervention/details_intervention_screen.dart';
 import 'package:global_renov/screens/intervention/intervention_list_screen.dart';
 import 'package:global_renov/services/intervention_service.dart';
 import 'package:provider/provider.dart';
 
-
-class CreateInterventionScreen extends StatefulWidget {
-  const CreateInterventionScreen({super.key});
+class CreateEditInterventionScreen extends StatefulWidget {
+  final String? idIntervention;
+  const CreateEditInterventionScreen({super.key, this.idIntervention = ''});
 
   @override
-  CreateInterventionScreenState createState() =>
-      CreateInterventionScreenState();
+  CreateEditInterventionScreenState createState() =>
+      CreateEditInterventionScreenState();
 }
 
-class CreateInterventionScreenState extends State<CreateInterventionScreen> {
+class CreateEditInterventionScreenState
+    extends State<CreateEditInterventionScreen> {
   final TextEditingController _dateController = TextEditingController();
   final TextEditingController _clientNameController = TextEditingController();
   final TextEditingController _streetController = TextEditingController();
   final TextEditingController _postalCodeController = TextEditingController();
   final TextEditingController _cityController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
+  late Future<Map<String, dynamic>?> _futureIntervention;
   bool _isLoading = false;
-  static const Color _buttonColor = Color(0xFF55895B);
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.idIntervention!.isNotEmpty) {
+      _futureIntervention = InterventionService()
+          .fetchSingleIntervention(widget.idIntervention as String);
+      _futureIntervention.then((data) {
+        if (data!.isNotEmpty && data['interventions'].isNotEmpty) {
+          final firstIntervention = data['interventions'][0];
+          _dateController.text = firstIntervention['date'];
+          _clientNameController.text = firstIntervention['customer'];
+          _streetController.text = firstIntervention['address']['street'];
+          _postalCodeController.text =
+              firstIntervention['address']['postalCode'];
+          _cityController.text = firstIntervention['address']['city'];
+          _descriptionController.text = firstIntervention['description'];
+        }
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -31,27 +54,40 @@ class CreateInterventionScreenState extends State<CreateInterventionScreen> {
 
     return PlatformScaffold(
       appBar: PlatformAppBar(
-        backgroundColor: const Color(0xFF55895B),
-        title: const Text("Créer une intervention",
-            style: TextStyle(color: Colors.white)),
+        backgroundColor: Colors.green,
+        title: Text(
+            widget.idIntervention!.isEmpty
+                ? "Créer une intervention"
+                : "Modifier l'intervention",
+            style: const TextStyle(color: Colors.white)),
         material: (_, __) => MaterialAppBarData(
           leading: IconButton(
             icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
-            onPressed: () => Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => const InterventionListScreen()),
-            ),
+            onPressed: () => widget.idIntervention!.isEmpty
+                ? Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const InterventionListScreen()))
+                : Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => DetailsInterventionScreen(
+                            idIntervention: widget.idIntervention as String))),
           ),
         ),
         cupertino: (_, __) => CupertinoNavigationBarData(
           leading: CupertinoNavigationBarBackButton(
             color: Colors.white,
-            onPressed: () => Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => const InterventionListScreen()),
-            ),
+            onPressed: () => widget.idIntervention!.isEmpty
+                ? Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const InterventionListScreen()))
+                : Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => DetailsInterventionScreen(
+                            idIntervention: widget.idIntervention as String))),
           ),
         ),
       ),
@@ -83,7 +119,7 @@ class CreateInterventionScreenState extends State<CreateInterventionScreen> {
             _buildSectionHeader("Description"),
             _buildDescriptionField(),
             const SizedBox(height: 32),
-            _buildCreateButton(interventionService),
+            _buildCreateOrUpdateButton(interventionService),
           ],
         ),
       ),
@@ -98,7 +134,7 @@ class CreateInterventionScreenState extends State<CreateInterventionScreen> {
             style: const TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
-                color: Color(0xFF55895B))),
+                color: Colors.green)),
       ),
     );
   }
@@ -214,17 +250,17 @@ class CreateInterventionScreenState extends State<CreateInterventionScreen> {
     );
   }
 
-  Widget _buildCreateButton(InterventionService interventionService) {
+  Widget _buildCreateOrUpdateButton(InterventionService interventionService) {
     return SizedBox(
-      width: 400,
+      width: double.infinity,
       height: 50,
       child: PlatformElevatedButton(
         onPressed: _isLoading
             ? null
-            : () => _handleCreateIntervention(interventionService),
+            : () => _handleCreateOrUpdateIntervention(interventionService),
         material: (_, __) => MaterialElevatedButtonData(
           style: ElevatedButton.styleFrom(
-            backgroundColor: const Color(0xFF55895B),
+            backgroundColor: Colors.green,
             textStyle: const TextStyle(color: Colors.white),
             elevation: 4,
             shape:
@@ -233,7 +269,7 @@ class CreateInterventionScreenState extends State<CreateInterventionScreen> {
           ),
         ),
         cupertino: (_, __) => CupertinoElevatedButtonData(
-          color: const Color(0xFF55895B),
+          color: Colors.green,
           borderRadius: BorderRadius.circular(7),
         ),
         child: _isLoading
@@ -241,15 +277,87 @@ class CreateInterventionScreenState extends State<CreateInterventionScreen> {
                 width: 20,
                 height: 20,
                 child: CircularProgressIndicator(
-                  valueColor: AlwaysStoppedAnimation<Color>(_buttonColor),
+                  valueColor: AlwaysStoppedAnimation<Color>(Colors.green),
                   strokeWidth: 2.0,
                   backgroundColor: Colors.white,
                 ),
               )
-            : const Text('Créer',
-                style: TextStyle(color: Colors.white, fontSize: 18)),
+            : Text(widget.idIntervention!.isEmpty ? 'Créer' : 'Mettre à jour',
+                style: const TextStyle(color: Colors.white, fontSize: 18)),
       ),
     );
+  }
+
+  void _handleCreateOrUpdateIntervention(
+      InterventionService interventionService) async {
+    String defaultStatus = "scheduled";
+    Map<String, dynamic> data = {};
+
+    if (_dateController.text.isNotEmpty) {
+      data['date'] = _dateController.text;
+    }
+
+    if (_clientNameController.text.isNotEmpty) {
+      data['customer'] = _clientNameController.text;
+    }
+
+    if (_streetController.text.isNotEmpty ||
+        _postalCodeController.text.isNotEmpty ||
+        _cityController.text.isNotEmpty) {
+      data['address'] = Address(
+        street: _streetController.text,
+        postalCode: _postalCodeController.text,
+        city: _cityController.text,
+      ).toJson();
+    }
+
+    if (_descriptionController.text.isNotEmpty) {
+      data['description'] = _descriptionController.text;
+    }
+
+    setState(() => _isLoading = true);
+
+    try {
+      if (widget.idIntervention!.isNotEmpty) {
+        await interventionService.updateAnIntervention(
+            widget.idIntervention as String, data);
+
+        return;
+      }
+
+      await interventionService.createIntervention(
+        defaultStatus,
+        _dateController.text,
+        _clientNameController.text,
+        Address(
+          street: _streetController.text,
+          postalCode: _postalCodeController.text,
+          city: _cityController.text,
+        ),
+        _descriptionController.text,
+      );
+    } catch (e) {
+      String interventionIdentifier = widget.idIntervention as String;
+      String modeText =
+          widget.idIntervention!.isEmpty ? 'création' : 'mise à jour';
+      String message =
+          'Erreur lors de la ${modeText} de l\'intervention $interventionIdentifier: ${e.toString()}';
+      _showErrorDialog(message);
+    } finally {
+      setState(() => _isLoading = false);
+      if (widget.idIntervention!.isNotEmpty) {
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => DetailsInterventionScreen(
+                    idIntervention: widget.idIntervention as String)));
+      } else {
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => const InterventionListScreen()));
+      }
+    }
   }
 
   void _showErrorDialog(String message) {
@@ -266,40 +374,5 @@ class CreateInterventionScreenState extends State<CreateInterventionScreen> {
         ],
       ),
     );
-  }
-
-  void _handleCreateIntervention(
-    InterventionService interventionService) async {
-
-      String defaultStatus = "scheduled";
-      String date = _dateController.text;
-      String customer = _clientNameController.text;
-      String street = _streetController.text;
-      String postalCode = _postalCodeController.text;
-      String city = _cityController.text;
-      Address address = Address(street: street, postalCode: postalCode, city: city);
-      String description = _descriptionController.text;
-      
-      
-      setState(() {
-        _isLoading = true;
-      });
-
-      try {
-        await interventionService.createIntervention(
-          defaultStatus,
-          date,
-          customer,
-          address,
-          description,
-        );
-
-      } catch (e) {
-        _showErrorDialog('Erreur de la création: ${e.toString()}');
-      } finally {
-        setState(() {
-          _isLoading = false;
-        });
-      }
   }
 }

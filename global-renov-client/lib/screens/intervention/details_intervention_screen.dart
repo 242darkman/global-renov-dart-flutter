@@ -76,7 +76,13 @@ class DetailsInterventionScreenState extends State<DetailsInterventionScreen> {
               children: <Widget>[
                 _buildField('status', 'Statut'),
                 const Spacer(),
-                _buildActionButton(Icons.edit, Colors.green, () {}),
+                _buildActionButton(Icons.edit, Colors.green, () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => CreateEditInterventionScreen(
+                              idIntervention: widget.idIntervention)));
+                }),
                 const SizedBox(width: 13),
                 _buildActionButton(Icons.delete, Colors.red, () {}),
               ],
