@@ -32,7 +32,7 @@ The objective of the project is to provide an application that manages the inter
 
 - **Intervention Status Tracking**
   - Track the status of each intervention, with statuses including:
-    - `Scheduled`
+    - `Scheduled` (only a scheduled intervention can be **cancelled** or **closed**.)
     - `Cancelled`
     - `Closed`
 
